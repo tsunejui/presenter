@@ -7,8 +7,12 @@ services:
     volumes:
       - ./scripts:/scripts
       - ./templates:/templates
+      - ./data/markdown:/data
     command:
-      - /scripts/
+      - /scripts/gen-md.sh
+      - example,kubernetes-resource
+      - /templates
+      - /data
 
   node-exporter:
     privileged: true
@@ -17,7 +21,7 @@ services:
     restart: always
     # ref: https://stackoverflow.com/a/70327319
     depends_on:
-      hello:
+      markdown-generator:
         condition: service_completed_successfully
     
     ports:

@@ -14,6 +14,10 @@ date: ${current_date}
 geometry: "a4paper,left=1cm,right=1cm,top=2cm,bottom=2cm"
 ---
 
-###  
+## Cluster Resource Usage Overview
+
+## Cluster Resource Usage By Node
+
+## Cluster Resource Usage By Namespace
 
 EOF
