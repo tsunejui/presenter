@@ -1,0 +1,8 @@
+# docker buildx build --platform linux/amd64 -f dockers/Dockerfile.tools . -t presenter-tools
+FROM registry.access.redhat.com/ubi9/ubi
+
+COPY plugins /plguins
+
+WORKDIR /plguins
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]

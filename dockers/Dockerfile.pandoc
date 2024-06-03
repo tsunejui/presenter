@@ -1,0 +1,8 @@
+# docker buildx build --platform linux/amd64 -f dockers/Dockerfile.pandoc . -t presenter-pandoc
+FROM pandoc/latex:3.2
+
+COPY example /example
+
+RUN [
+    ""
+]

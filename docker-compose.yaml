@@ -1,0 +1,62 @@
+# docker compose -f docker-compose.yaml up -d
+services:
+
+  markdown-generator:
+    container_name: presenter-md-generator
+    image: registry.access.redhat.com/ubi9/ubi
+    volumes:
+      - ./scripts:/scripts
+      - ./templates:/templates
+    command:
+      - /scripts/
+
+  node-exporter:
+    privileged: true
+    image: prom/node-exporter:v1.8.1
+    container_name: node-exporter
+    restart: always
+    # ref: https://stackoverflow.com/a/70327319
+    depends_on:
+      hello:
+        condition: service_completed_successfully
+    
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points"
+      - "^/(rootfs/)?(dev|etc|host|proc|run|sys|volume1)($$|/)"
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    depends_on:
+      - node-exporter
+    volumes:
+      - ./conf/prometheus:/etc/prometheus
+      - ./data/prometheus:/prometheus
+
+  grafana:
+    image: grafana/grafana:10.1.10
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./conf/grafana:/etc/grafana/provisioning/datasources
+      - ./data/grafana:/var/lib/grafana
